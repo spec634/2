@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartoon Number Guesser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffccd5, #ffb7c5, #a5d6ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 35px;
+            box-shadow: 0 20px 50px rgba(255, 105, 180, 0.5);
+            overflow: hidden;
+            border: 12px solid #ff85a2;
+            position: relative;
+            animation: bounceIn 1s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        
+        .header {
+            background: linear-gradient(to right, #ff6b9d, #ff8fab, #6bb5ff);
+            color: white;
+            padding: 30px 35px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header h1 {
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+            text-shadow: 4px 4px 0 #ff3e7a;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .decoration {
+            position: absolute;
+            font-size: 2.5rem;
+            opacity: 0.6;
+            animation: float 4s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+        
+        .decoration:nth-child(1) { top: 15px; left: 20px; animation-delay: 0s; }
+        .decoration:nth-child(2) { top: 10px; right: 30px; animation-delay: 0.5s; }
+        .decoration:nth-child(3) { bottom: 15px; left: 40px; animation-delay: 1s; }
+        .decoration:nth-child(4) { bottom: 10px; right: 50px; animation-delay: 1.5s; }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+        }
+        
+        .game-info {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 30px;
+        }
+        
+        .game-screen {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff9fb;
+            border-radius: 25px;
+            padding: 30px;
+            border: 5px dashed #ffb6c1;
+            box-shadow: inset 0 0 20px rgba(255, 182, 193, 0.3);
+        }
+        
+        .counter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            background-color: #fff0f5;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+        }
+        
+        .counter-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .counter-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff6b9d;
+            display: block;
+            text-shadow: 2px 2px 0 #ffb6c1;
+        }
+        
+        .counter-label {
+            font-size: 1.2rem;
+            color: #ff8fab;
+            font-weight: bold;
+        }
+        
+        .game-hint {
+            background-color: #fff0f5;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .hint-text {
+            font-size: 1.8rem;
+            color: #ff6b9d;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .range-text {
+            font-size: 1.4rem;
+            color: #ff8fab;
+        }
+        
+        .input-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .number-input {
+            width: 140px;
+            height: 80px;
+            font-size: 3rem;
+            text-align: center;
+            border: 6px solid #ffb6c1;
+            border-radius: 20px;
+            margin-right: 20px;
+            color: #ff6b9d;
+            outline: none;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .number-input:focus {
+            border-color: #6bb5ff;
+            box-shadow: 0 0 25px rgba(107, 181, 255, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .guess-btn {
+            background: linear-gradient(to bottom, #ff6b9d, #ff4d87);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            font-size: 1.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 0 #ff3e7a;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .guess-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 0 #ff3e7a;
+            background: linear-gradient(to bottom, #ff8fab, #ff6b9d);
+        }
+        
+        .guess-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 5px 0 #ff3e7a;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .restart-btn {
+            background-color: #a5d6a7;
+            color: #2e7d32;
+            box-shadow: 0 6px 0 #81c784;
+        }
+        
+        .hint-btn {
+            background-color: #ffcc80;
+            color: #ef6c00;
+            box-shadow: 0 6px 0 #ffb74d;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .action-btn:active {
+            transform: translateY(2px);
+        }
+        
+        .history-title {
+            font-size: 1.8rem;
+            color: #ff6b9d;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 1px 1px 0 #ffb6c1;
+        }
+        
+        .history-list {
+            max-height: 220px;
+            overflow-y: auto;
+            background-color: #fff0f5;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: inset 0 0 15px rgba(255, 182, 193, 0.3);
+        }
+        
+        .history-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .guess-value {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #ff6b9d;
+        }
+        
+        .guess-result {
+            font-size: 1.2rem;
+            padding: 6px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .too-high { background-color: #ff8a80; }
+        .too-low { background-color: #80d8ff; color: #01579b; }
+        .correct { background-color: #a7ffeb; color: #00bfa5; font-weight: bold; }
+        
+        .number-display {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #ff6b9d;
+            text-shadow: 4px 4px 0 #ffb6c1;
+            margin: 25px 0;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s;
+            background-color: #fff0f5;
+            border-radius: 20px;
+            width: 200px;
+            box-shadow: 0 10px 20px rgba(255, 107, 157, 0.2);
+        }
+        
+        .character {
+            width: 180px;
+            height: 180px;
+            background-color: #ffccd5;
+            border-radius: 50%;
+            position: relative;
+            margin: 25px 0;
+            box-shadow: 0 15px 25px rgba(255, 107, 157, 0.3);
+            overflow: hidden;
+            border: 8px solid white;
+        }
+        
+        .eye {
+            width: 40px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 55px;
+            border: 4px solid #ff6b9d;
+        }
+        
+        .left-eye { left: 45px; }
+        .right-eye { right: 45px; }
+        
+        .pupil {
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 15px;
+            left: 10px;
+        }
+        
+        .mouth {
+            width: 80px;
+            height: 40px;
+            border-bottom: 12px solid #ff6b9d;
+            border-radius: 0 0 40px 40px;
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            transition: all 0.3s;
+        }
+        
+        .game-instructions {
+            background-color: #e3f2fd;
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 25px;
+            border-left: 8px solid #64b5f6;
+        }
+        
+        .game-instructions h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .game-instructions ul {
+            padding-left: 25px;
+        }
+        
+        .game-instructions li {
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .difficulty {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        .easy { background-color: #c8e6c9; color: #2e7d32; }
+        .medium { background-color: #fff9c4; color: #f57f17; }
+        .hard { background-color: #ffccbc; color: #d84315; }
+        
+        .difficulty-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .game-info {
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+            
+            .number-input {
+                width: 120px;
+                height: 70px;
+                font-size: 2.5rem;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .guess-btn {
+                padding: 15px 25px;
+                font-size: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .character {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 10;
+        }
+        
+        .win-animation {
+            animation: confettiFall 3s forwards;
+        }
+        
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(800px) rotate(360deg); opacity: 0; }
+        }
+        
+        .celebration {
+            font-size: 4rem;
+            color: gold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: celebrate 0.5s infinite alternate;
+            display: none;
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #ff8fab;
+            font-size: 1.1rem;
+            background-color: #fff9fb;
+            border-top: 3px dashed #ffb6c1;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <div class="decoration">🎮</div>
+            <div class="decoration">🎯</div>
+            <div class="decoration">🔢</div>
+            <div class="decoration">🎪</div>
+            <h1>Cartoon Number Guesser</h1>
+            <p>Guess the secret number between 0 and 100!</p>
+        </div>
+        
+        <div class="content">
+            <div class="game-info">
+                <div class="counter">
+                    <div class="counter-item">
+                        <span class="counter-value" id="attempts">0</span>
+                        <span class="counter-label">Attempts</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-value" id="timer">60</span>
+                        <span class="counter-label">Seconds Left</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-value" id="score">1000</span>
+                        <span class="counter-label">Score</span>
+                    </div>
+                </div>
+                
+                <div class="game-hint" id="hintBox">
+                    <div class="hint-text" id="hintText">Enter your first guess!</div>
+                    <div class="range-text" id="rangeText">Range: 0 - 100</div>
+                </div>
+                
+                <div class="input-area">
+                    <input type="number" class="number-input" id="guessInput" min="0" max="100" placeholder="?" autofocus>
+                    <button class="guess-btn" id="guessBtn">
+                        <i class="fas fa-paper-plane"></i> Guess!
+                    </button>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn restart-btn" id="restartBtn">
+                        <i class="fas fa-redo"></i> New Game
+                    </button>
+                    <button class="action-btn hint-btn" id="hintBtn">
+                        <i class="fas fa-lightbulb"></i> Get Hint
+                    </button>
+                </div>
+                
+                <div class="difficulty">
+                    <button class="difficulty-btn easy active" data-difficulty="easy">Easy (0-100)</button>
+                    <button class="difficulty-btn medium" data-difficulty="medium">Medium (0-200)</button>
+                    <button class="difficulty-btn hard" data-difficulty="hard">Hard (0-500)</button>
+                </div>
+                
+                <h3 class="history-title">Guess History</h3>
+                <div class="history-list" id="historyList">
+                    <!-- Guess history will appear here -->
+                </div>
+                
+                <div class="game-instructions">
+                    <h3><i class="fas fa-info-circle"></i> How to Play</h3>
+                    <ul>
+                        <li>Guess a number between 0 and 100</li>
+                        <li>You'll get hints if your guess is too high or too low</li>
+                        <li>Try to find the secret number in as few attempts as possible</li>
+                        <li>Each game lasts 60 seconds - guess quickly for bonus points!</li>
+                        <li>Choose a difficulty level for different challenges</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="game-screen">
+                <div class="celebration" id="celebration">🎉 🎊 🎈</div>
+                <div class="number-display" id="numberDisplay">?</div>
+                
+                <div class="character">
+                    <div class="eye left-eye">
+                        <div class="pupil"></div>
+                    </div>
+                    <div class="eye right-eye">
+                        <div class="pupil"></div>
+                    </div>
+                    <div class="mouth" id="characterMouth"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" id="showAnswerBtn" style="background-color: #bbdefb; color: #1565c0; box-shadow: 0 6px 0 #90caf9;">
+                        <i class="fas fa-eye"></i> Reveal Answer
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Made with <i class="fas fa-heart" style="color: #ff6b9d;"></i> | Cartoon Number Guesser © 2023</p>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let secretNumber = Math.floor(Math.random() * 101);
+        let attempts = 0;
+        let maxNumber = 100;
+        let timer = 60;
+        let score = 1000;
+        let gameActive = true;
+        let timerInterval;
+        let guessHistory = [];
+        let difficulty = "easy";
+        
+        // DOM elements
+        const guessInput = document.getElementById('guessInput');
+        const guessBtn = document.getElementById('guessBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const showAnswerBtn = document.getElementById('showAnswerBtn');
+        const attemptsElement = document.getElementById('attempts');
+        const timerElement = document.getElementById('timer');
+        const scoreElement = document.getElementById('score');
+        const hintText = document.getElementById('hintText');
+        const rangeText = document.getElementById('rangeText');
+        const historyList = document.getElementById('historyList');
+        const numberDisplay = document.getElementById('numberDisplay');
+        const characterMouth = document.getElementById('characterMouth');
+        const celebration = document.getElementById('celebration');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        
+        // Initialize game
+        function initGame() {
+            clearInterval(timerInterval);
+            setDifficulty("easy");
+            startGame();
+        }
+        
+        // Set difficulty level
+        function setDifficulty(level) {
+            difficulty = level;
+            
+            // Update UI
+            difficultyButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.difficulty === level) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Set range based on difficulty
+            switch(level) {
+                case "easy":
+                    maxNumber = 100;
+                    break;
+                case "medium":
+                    maxNumber = 200;
+                    break;
+                case "hard":
+                    maxNumber = 500;
+                    break;
+            }
+            
+            rangeText.textContent = `Range: 0 - ${maxNumber}`;
+        }
+        
+        // Start a new game
+        function startGame() {
+            secretNumber = Math.floor(Math.random() * (maxNumber + 1));
+            attempts = 0;
+            timer = 60;
+            score = 1000;
+            gameActive = true;
+            guessHistory = [];
+            
+            // Reset UI
+            attemptsElement.textContent = attempts;
+            timerElement.textContent = timer;
+            scoreElement.textContent = score;
+            hintText.textContent = "Enter your first guess!";
+            hintText.style.color = "#ff6b9d";
+            historyList.innerHTML = "";
+            numberDisplay.textContent = "?";
+            numberDisplay.style.color = "#ff6b9d";
+            characterMouth.style.borderBottomColor = "#ff6b9d";
+            celebration.style.display = "none";
+            guessInput.value = "";
+            guessInput.focus();
+            guessInput.disabled = false;
+            guessBtn.disabled = false;
+            
+            // Start timer
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            // Reset character mouth
+            characterMouth.style.width = "80px";
+            characterMouth.style.borderBottom = "12px solid #ff6b9d";
+            characterMouth.style.borderRadius = "0 0 40px 40px";
+            
+            console.log("Secret number (for testing):", secretNumber);
+        }
+        
+        // Update timer
+        function updateTimer() {
+            if (!gameActive) return;
+            
+            timer--;
+            timerElement.textContent = timer;
+            
+            // Update score based on time
+            if (timer > 0) {
+                score = Math.max(100, 1000 - attempts * 50 - (60 - timer) * 5);
+                scoreElement.textContent = score;
+            }
+            
+            // Time's up
+            if (timer <= 0) {
+                endGame(false, "Time's up! You ran out of time.");
+            }
+            
+            // Visual timer warning
+            if (timer <= 10) {
+                timerElement.style.color = "#ff3e7a";
+                timerElement.style.animation = "pulse 0.5s infinite alternate";
+            }
+        }
+        
+        // Handle guess submission
+        function submitGuess() {
+            if (!gameActive) return;
+            
+            const guess = parseInt(guessInput.value);
+            
+            // Validate input
+            if (isNaN(guess) || guess < 0 || guess > maxNumber) {
+                hintText.textContent = `Please enter a number between 0 and ${maxNumber}!`;
+                hintText.style.color = "#ff3e7a";
+                shakeElement(hintText);
+                return;
+            }
+            
+            // Process guess
+            attempts++;
+            attemptsElement.textContent = attempts;
+            guessInput.value = "";
+            
+            // Add to history
+            addToHistory(guess);
+            
+            // Check guess
+            if (guess === secretNumber) {
+                endGame(true, `Congratulations! You found the number ${secretNumber} in ${attempts} attempts!`);
+            } else if (guess < secretNumber) {
+                hintText.textContent = "Too low! Try a higher number.";
+                hintText.style.color = "#80d8ff";
+                updateCharacter("low");
+            } else {
+                hintText.textContent = "Too high! Try a lower number.";
+                hintText.style.color = "#ff8a80";
+                updateCharacter("high");
+            }
+            
+            // Update score
+            score = Math.max(100, 1000 - attempts * 50 - (60 - timer) * 5);
+            scoreElement.textContent = score;
+        }
+        
+        // Add guess to history
+        function addToHistory(guess) {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const guessValue = document.createElement('span');
+            guessValue.className = 'guess-value';
+            guessValue.textContent = guess;
+            
+            const guessResult = document.createElement('span');
+            guessResult.className = 'guess-result';
+            
+            if (guess === secretNumber) {
+                guessResult.textContent = 'Correct!';
+                guessResult.className += ' correct';
+            } else if (guess < secretNumber) {
+                guessResult.textContent = 'Too Low';
+                guessResult.className += ' too-low';
+            } else {
+                guessResult.textContent = 'Too High';
+                guessResult.className += ' too-high';
+            }
+            
+            historyItem.appendChild(guessValue);
+            historyItem.appendChild(guessResult);
+            historyList.prepend(historyItem);
+            
+            // Keep only last 8 guesses in view
+            const items = historyList.querySelectorAll('.history-item');
+            if (items.length > 8) {
+                items[items.length - 1].remove();
+            }
+        }
+        
+        // Update character expression
+        function updateCharacter(result) {
+            if (result === "low") {
+                // Sad/concerned expression
+                characterMouth.style.width = "60px";
+                characterMouth.style.borderBottom = "8px solid #80d8ff";
+                characterMouth.style.borderRadius = "0 0 30px 30px";
+            } else if (result === "high") {
+                // Surprised expression
+                characterMouth.style.width = "40px";
+                characterMouth.style.height = "40px";
+                characterMouth.style.borderBottom = "none";
+                characterMouth.style.borderRadius = "50%";
+                characterMouth.style.backgroundColor = "#ff8a80";
+            }
+            
+            // Return to normal after 1 second
+            setTimeout(() => {
+                characterMouth.style.width = "80px";
+                characterMouth.style.height = "40px";
+                characterMouth.style.borderBottom = "12px solid #ff6b9d";
+                characterMouth.style.borderRadius = "0 0 40px 40px";
+                characterMouth.style.backgroundColor = "transparent";
+            }, 1000);
+        }
+        
+        // End the game
+        function endGame(won, message) {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            // Display message
+            hintText.textContent = message;
+            hintText.style.color = won ? "#00bfa5" : "#ff3e7a";
+            
+            // Show the secret number
+            numberDisplay.textContent = secretNumber;
+            numberDisplay.style.color = won ? "#00bfa5" : "#ff3e7a";
+            
+            // Disable input
+            guessInput.disabled = true;
+            guessBtn.disabled = true;
+            
+            // Celebrate if won
+            if (won) {
+                celebration.style.display = "block";
+                createConfetti();
+                characterMouth.style.borderBottomColor = "#00bfa5";
+                
+                // Happy expression
+                characterMouth.style.width = "100px";
+                characterMouth.style.borderBottom = "15px solid #00bfa5";
+                characterMouth.style.borderRadius = "0 0 50px 50px";
+            } else {
+                // Sad expression
+                characterMouth.style.width = "60px";
+                characterMouth.style.borderBottom = "8px solid #ff3e7a";
+                characterMouth.style.borderRadius = "50% 50% 0 0";
+                characterMouth.style.transform = "rotate(180deg)";
+            }
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#6bb5ff', '#a5d6a7', '#ffcc80', '#a7ffeb'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti win-animation';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                
+                document.body.appendChild(confetti);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+        
+        // Get a hint
+        function getHint() {
+            if (!gameActive || attempts === 0) {
+                hintText.textContent = "Make at least one guess first!";
+                hintText.style.color = "#ffcc80";
+                shakeElement(hintText);
+                return;
+            }
+            
+            // Deduct points for hint
+            score = Math.max(0, score - 100);
+            scoreElement.textContent = score;
+            
+            // Provide a hint
+            const hints = [
+                `The number is ${secretNumber % 2 === 0 ? 'even' : 'odd'}.`,
+                `The number is ${secretNumber > maxNumber/2 ? 'greater' : 'less'} than ${Math.floor(maxNumber/2)}.`,
+                `The number is between ${Math.max(0, secretNumber-10)} and ${Math.min(maxNumber, secretNumber+10)}.`,
+                `The sum of digits is ${String(secretNumber).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0)}.`
+            ];
+            
+            const randomHint = hints[Math.floor(Math.random() * hints.length)];
+            hintText.textContent = `Hint: ${randomHint}`;
+            hintText.style.color = "#ffcc80";
+            
+            // Show hint temporarily
+            setTimeout(() => {
+                if (gameActive) {
+                    hintText.textContent = "Keep guessing!";
+                    hintText.style.color = "#ff6b9d";
+                }
+            }, 3000);
+        }
+        
+        // Show answer
+        function showAnswer() {
+            if (gameActive) {
+                score = Math.max(0, score - 500);
+                scoreElement.textContent = score;
+                endGame(false, `The secret number was ${secretNumber}. Try again!`);
+            } else {
+                hintText.textContent = `The secret number was ${secretNumber}. Start a new game!`;
+            }
+        }
+        
+        // Shake element animation
+        function shakeElement(element) {
+            element.style.animation = 'none';
+            setTimeout(() => {
+                element.style.animation = 'shake 0.5s';
+            }, 10);
+            
+            // Add shake animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            setTimeout(() => {
+                element.style.animation = '';
+                document.head.removeChild(style);
+            }, 500);
+        }
+        
+        // Event listeners
+        guessBtn.addEventListener('click', submitGuess);
+        guessInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitGuess();
+        });
+        restartBtn.addEventListener('click', startGame);
+        hintBtn.addEventListener('click', getHint);
+        showAnswerBtn.addEventListener('click', showAnswer);
+        
+        // Difficulty buttons
+        difficultyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setDifficulty(btn.dataset.difficulty);
+                startGame();
+            });
+        });
+        
+        // Initialize game
+        initGame();
+    </script>
+</body>
+</html>
